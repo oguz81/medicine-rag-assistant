@@ -1,3 +1,6 @@
+## ILAÇ ASISTANI-- backend
+## Oguz Demirtas
+
 # backend/api.py
 
 from fastapi import FastAPI
@@ -7,14 +10,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from .rag_chain import answer_question
 
 app = FastAPI(
-    title="Medicine Info RAG Assistant",
-    description="Provides leaflet-based info about medicines. Not medical advice.",
+    title="İLAÇ ASİSTANI",
+    description="Prospektüsten bilgiler verir. Tıbbi nitelik taşımaz",
 )
 
-# Allow frontend (Streamlit) to call this API easily
+# Frontend, API'yı çağırır
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # for dev; later you can restrict
+    allow_origins=["*"],  # daha sonra degistirebilirsin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,6 +25,7 @@ app.add_middleware(
 
 class QuestionRequest(BaseModel):
     question: str
+    medicine_name_input: str
 
 class AnswerResponse(BaseModel):
     answer: str
@@ -29,6 +33,7 @@ class AnswerResponse(BaseModel):
 
 @app.post("/chat", response_model=AnswerResponse)
 async def chat(req: QuestionRequest):
-    answer, sources = answer_question(req.question)
+    answer, sources = answer_question(question=req.question,
+                                       medicine_name_input=req.medicine_name_input)
     return AnswerResponse(answer=answer, sources=sources)
 
