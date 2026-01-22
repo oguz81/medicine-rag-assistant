@@ -1,30 +1,33 @@
-# frontend/app.py
+## İLAÇ ASİSTANI -- Frontend kodu
+## Oğuz Demirtaş
 
 import streamlit as st
 import requests
 
 BACKEND_URL = "http://127.0.0.1:8000/chat"
 
-st.set_page_config(page_title="Medicine Info Assistant", page_icon="💊")
+st.set_page_config(page_title="İLAÇ ASİSTANI", page_icon="💊")
 
-st.title("💊 Medicine Info Assistant")
-st.caption("Answers from official leaflets only. This is NOT medical advice.")
+st.title("💊 İLAÇ ASİSTANI")
+st.caption("Kullandığınız ilaçla ilgili neyi merak ediyorsunuz? İlacın prospektüsünden bakıp hemen söyleyelim.\n\n(Tıbbi bilgi değildir. Mutlaka doktorunuza danışın.)")
 
 if "history" not in st.session_state:
     st.session_state["history"] = []
 
-medicine_name_input = st.text_input("Ilac adini yaz",width=200)
-user_input = st.text_input("Ask about a medicine (e.g., dosage, side effects, usage):")
+medicine_name_input = st.text_input("Hangi ilacı kullanıyorsunuz?",width=200)
+user_input = st.text_input("Sorunuzu sorun: (örn, yan etkileri nelerdir, haftada kaç gün kullanmalıyım)")
 
-if st.button("Ask") and user_input.strip():
-    with st.spinner("Thinking..."):
-        resp = requests.post(BACKEND_URL, json={"question": user_input})
+if st.button("Sor") and user_input.strip() and medicine_name_input.strip():
+    with st.spinner("İlgileniyorum..."):
+        resp = requests.post(BACKEND_URL, json={"medicine_name_input": medicine_name_input,
+                   "question": user_input})
         if resp.status_code == 200:
             data = resp.json()
             answer = data["answer"]
             sources = data["sources"]
 
             st.session_state["history"].append({
+                "medicine_name_input": medicine_name_input,
                 "question": user_input,
                 "answer": answer,
                 "sources": sources,
@@ -34,11 +37,11 @@ if st.button("Ask") and user_input.strip():
 
 # Show chat history
 for turn in reversed(st.session_state["history"]):
-    st.markdown(f"**You:** {turn['question']}")
-    st.markdown(f"**Assistant:** {turn['answer']}")
+    st.markdown(f"**İlaç:** {turn['medicine_name_input']}")
+    st.markdown(f"**Siz:** {turn['question']}")
+    st.markdown(f"**Asistan:** {turn['answer']}")
     if turn["sources"]:
-        st.markdown(f"_Sources: {', '.join(turn['sources'])}_")
+        st.markdown(f"_Kaynaklar: {', '.join(turn['sources'])}_")
     st.markdown("---")
-
-st.markdown("⚠️ **Disclaimer:** This tool only summarizes leaflet information and is **not** medical advice.")
+    st.markdown("⚠️ **Sorumluluk reddi:** Bu sayfa yalnızca ilacın prospektüsünde yer alan bilgileri özetler ve **ASLA** tıbbi bilgi ve tavsiye niteliği taşımaz.")
 
