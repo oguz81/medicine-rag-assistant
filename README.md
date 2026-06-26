@@ -22,5 +22,4 @@ Uygulama web ve mobilde kullanılacak şekilde geliştirilmektedir. Kullanıma h
 ## Backend
 ChromaDB, FastAPI, Uvicorn ve dil modeli olarak gpt-4o-mini (OpenAI) kullanılmıştır.
 ## Frontend
-#### Frontend
-##Streamlit kullanılmıştır.
+Streamlit kullanılmıştır.
